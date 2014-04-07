@@ -71,26 +71,32 @@ class decoder:
 
          if self.in_code == False:
             self.bits = 1
-            self.num = 0
-            self.raw = []
+            self.facility_num = 0
+            self.id_num = 0
 
             self.in_code = True
             self.code_timeout = 0
             pigpio.set_watchdog(self.gpio_0, self.bit_timeout)
             pigpio.set_watchdog(self.gpio_1, self.bit_timeout)
          else:
-            self.bits += 1
-            self.num = self.num << 1
+            if self.bits > 0 and self.bits < 10:
+              self.bits += 1
+              self.facility_num = self.facility_num << 1
 
-         if gpio == self.gpio_0:
-            self.raw.append(0)
-            self.code_timeout = self.code_timeout & 2 # clear gpio 0 timeout
-            
-         else:
-            self.raw.append(1)
-            self.code_timeout = self.code_timeout & 1 # clear gpio 1 timeout
-            self.num = self.num | 1
-            
+              if gpio == self.gpio_0:
+                self.code_timeout = self.code_timeout & 2 # clear gpio 0 timeout
+              else:
+                self.code_timeout = self.code_timeout & 1 # clear gpio 1 timeout
+                self.facility_num = self.facility_num | 1
+            else:
+              self.bits += 1
+              self.id_num = self.id_num << 1
+
+            if gpio == self.gpio_0:
+              self.code_timeout = self.code_timeout & 2 # clear gpio 0 timeout
+            else:
+              self.code_timeout = self.code_timeout & 1 # clear gpio 1 timeout
+              self.id_num = self.id_num | 1
 
       else:
 
@@ -105,7 +111,7 @@ class decoder:
                pigpio.set_watchdog(self.gpio_0, 0)
                pigpio.set_watchdog(self.gpio_1, 0)
                self.in_code = False
-               self.callback(self.bits, self.num, self.raw)
+               self.callback(self.bits, self.facility_num, self.id_num)
 
    def cancel(self):
 
@@ -124,19 +130,8 @@ if __name__ == "__main__":
 
    import wiegand
 
-   def callback(bits, value, raw):
-      if bits == 26:
-        facility_code = 0
-        id_code = 0
-        for i in range(1,9):
-          facility_code << 1
-          facility_code |= raw.index(i)
-        for i in range(9,25):
-          id_code << 1
-          id_code |= raw.index(i)
-        print("bits={} facility code={} id code={}".format(bits, facility_code, id_code))
-      else:
-        print("bits={} value={}".format(bits, value))
+   def callback(bits, facility, id_num):
+      print("bits={} facility={} id={}".format(bits, facility, id_num))
 
 
    pigpio.start()
