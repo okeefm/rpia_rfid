@@ -72,7 +72,7 @@ class decoder:
          if self.in_code == False:
             self.bits = 1
             self.num = 0
-            self.raw = array('c')
+            self.raw = []
 
             self.in_code = True
             self.code_timeout = 0
@@ -128,10 +128,10 @@ if __name__ == "__main__":
         id_code = 0
         for i in range(1,9):
           facility_code << 1
-          facility_code |= raw[i]
+          facility_code |= raw.index(i)
         for i in range(9,25):
           id_code << 1
-          id_code |= raw[i]
+          id_code |= raw.index(i)
         print("bits={} facility code={} id code={}".format(bits, facility_code, id_code))
       else:
         print("bits={} value={}".format(bits, value))
