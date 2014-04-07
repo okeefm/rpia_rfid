@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 import pigpio
+import urllib.parse
+import urllib.request
 
 class decoder:
 
