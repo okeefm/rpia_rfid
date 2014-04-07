@@ -85,6 +85,7 @@ class decoder:
 
               if gpio == self.gpio_0:
                 self.code_timeout = self.code_timeout & 2 # clear gpio 0 timeout
+                self.facility_num = self.facility_num | 0
               else:
                 self.code_timeout = self.code_timeout & 1 # clear gpio 1 timeout
                 self.facility_num = self.facility_num | 1
@@ -94,6 +95,7 @@ class decoder:
 
             if gpio == self.gpio_0:
               self.code_timeout = self.code_timeout & 2 # clear gpio 0 timeout
+              self.id_num = self.id_num | 0
             else:
               self.code_timeout = self.code_timeout & 1 # clear gpio 1 timeout
               self.id_num = self.id_num | 1
