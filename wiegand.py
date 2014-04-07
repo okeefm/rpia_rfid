@@ -79,8 +79,8 @@ class decoder:
             pigpio.set_watchdog(self.gpio_0, self.bit_timeout)
             pigpio.set_watchdog(self.gpio_1, self.bit_timeout)
          else:
-            if self.bits > 0 and self.bits < 10:
-              self.bits += 1
+            self.bits += 1
+            if (self.bits > 1) and (self.bits <= 9):
               self.facility_num = self.facility_num << 1
 
               if gpio == self.gpio_0:
@@ -88,8 +88,7 @@ class decoder:
               else:
                 self.code_timeout = self.code_timeout & 1 # clear gpio 1 timeout
                 self.facility_num = self.facility_num | 1
-            else:
-              self.bits += 1
+            elif (self.bits > 10) and (self.bits <= 25):
               self.id_num = self.id_num << 1
 
             if gpio == self.gpio_0:
