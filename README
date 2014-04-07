@@ -1,0 +1,2 @@
+This code base is for a access-control system for RPI Ambulance. It uses a HID reader attached to a Raspberry Pi for RFID checking, and a web server for access validation.
+
