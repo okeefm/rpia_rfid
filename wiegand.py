@@ -83,12 +83,14 @@ class decoder:
             self.num = self.num << 1
 
          if gpio == self.gpio_0:
-            self.code_timeout = self.code_timeout & 2 # clear gpio 0 timeout
             self.raw.append(0)
+            self.code_timeout = self.code_timeout & 2 # clear gpio 0 timeout
+            
          else:
+            self.raw.append(1)
             self.code_timeout = self.code_timeout & 1 # clear gpio 1 timeout
             self.num = self.num | 1
-            self.raw.append(1)
+            
 
       else:
 
