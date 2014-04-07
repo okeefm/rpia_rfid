@@ -122,7 +122,19 @@ if __name__ == "__main__":
    import wiegand
 
    def callback(bits, value):
-      print("bits={} value={}".format(bits, value))
+      if bits == 26:
+        facility_code = 0
+        id_code = 0
+        for i in range(1,9):
+          facility_code << 1
+          facility_code |= value[i]
+        for i in range(9,25):
+          id_code << 1
+          id_code |= value[i]
+        print("bits={} facility code={} id code={}".format(bits, facility_code, id_code))
+      else:
+        print("bits={} value={}".format(bits, value))
+
 
    pigpio.start()
 
