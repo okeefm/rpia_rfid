@@ -72,6 +72,7 @@ class decoder:
          if self.in_code == False:
             self.bits = 1
             self.num = 0
+            self.raw = array('c')
 
             self.in_code = True
             self.code_timeout = 0
@@ -83,9 +84,11 @@ class decoder:
 
          if gpio == self.gpio_0:
             self.code_timeout = self.code_timeout & 2 # clear gpio 0 timeout
+            self.raw.append(0)
          else:
             self.code_timeout = self.code_timeout & 1 # clear gpio 1 timeout
             self.num = self.num | 1
+            self.raw.append(1)
 
       else:
 
@@ -100,7 +103,7 @@ class decoder:
                pigpio.set_watchdog(self.gpio_0, 0)
                pigpio.set_watchdog(self.gpio_1, 0)
                self.in_code = False
-               self.callback(self.bits, self.num)
+               self.callback(self.bits, self.num, self.raw)
 
    def cancel(self):
 
@@ -119,16 +122,16 @@ if __name__ == "__main__":
 
    import wiegand
 
-   def callback(bits, value):
+   def callback(bits, value, raw):
       if bits == 26:
         facility_code = 0
         id_code = 0
         for i in range(1,9):
           facility_code << 1
-          facility_code |= value[i]
+          facility_code |= raw[i]
         for i in range(9,25):
           id_code << 1
-          id_code |= value[i]
+          id_code |= raw[i]
         print("bits={} facility code={} id code={}".format(bits, facility_code, id_code))
       else:
         print("bits={} value={}".format(bits, value))
