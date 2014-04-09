@@ -130,9 +130,12 @@ if __name__ == "__main__":
    import urllib2
    import json
    import dateutil.parser
-   
+   from datetime import datetime
+   import pytz
+
    cached_allows = {}
-   
+   utc = pytz.utc   
+
    def open_door():
       print "Opening door!"
 
@@ -140,7 +143,8 @@ if __name__ == "__main__":
       print("bits={} facility={} id={}".format(bits, facility, id_num))
       if (bits == 26):
          ident = str(facility) + str(id_num)
-         if ident in cached_allows and cached_allows[ident] > datetime.now():
+         if ident in cached_allows and cached_allows[ident] > utc.localize(datetime.utcnow()):
+            print "Cached authorization is present and valid"
             open_door()
          else:
             url = 'http://rpiambulance.com/doorauth.php'
@@ -150,10 +154,10 @@ if __name__ == "__main__":
             req = urllib2.Request(url, data)
             response = urllib2.urlopen(req)
             html = response.read()
-            print html
             vars = json.loads(html)
-            if vars['accept'] == true:
-               cached_allows[str(facility) + str(id_num)] = dateutil.parser.parse(vars['until'])
+            print vars
+            if vars['authorized'] == True:
+               cached_allows[ident] = dateutil.parser.parse(vars['until']).astimezone(utc)
                open_door()
            
    pigpio.start()
