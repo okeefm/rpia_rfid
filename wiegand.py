@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import pigpio
+import urllib2
 
 class decoder:
 
@@ -131,7 +132,10 @@ if __name__ == "__main__":
 
    def callback(bits, facility, id_num):
       print("bits={} facility={} id={}".format(bits, facility, id_num))
-
+      if (bits == 26):
+         response = urllib2.urlopen('http://localhost:3000/authenticate/'+ str(facility) + '/' + str(id_num))
+         html = response.read()
+         print html
 
    pigpio.start()
 
