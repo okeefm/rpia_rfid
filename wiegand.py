@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import pigpio
-import urllib2
 
 class decoder:
 
@@ -125,18 +124,38 @@ class decoder:
 if __name__ == "__main__":
 
    import time
-
    import pigpio
-
    import wiegand
+   import urllib
+   import urllib2
+   import json
+   import dateutil.parser
+   
+   cached_allows = {}
+   
+   def open_door():
+      print "Opening door!"
 
    def callback(bits, facility, id_num):
       print("bits={} facility={} id={}".format(bits, facility, id_num))
       if (bits == 26):
-         response = urllib2.urlopen('http://localhost:3000/authenticate/'+ str(facility) + '/' + str(id_num))
-         html = response.read()
-         print html
-
+         ident = str(facility) + str(id_num)
+         if ident in cached_allows and cached_allows[ident] > datetime.now():
+            open_door()
+         else:
+            url = 'http://rpiambulance.com/doorauth.php'
+            values = {'facility_id': facility,
+            'card_id': id_num}
+            data = urllib.urlencode(values)
+            req = urllib2.Request(url, data)
+            response = urllib2.urlopen(req)
+            html = response.read()
+            print html
+            vars = json.loads(html)
+            if vars['accept'] == true:
+               cached_allows[str(facility) + str(id_num)] = dateutil.parser.parse(vars['until'])
+               open_door()
+           
    pigpio.start()
 
    w = wiegand.decoder(23, 24, callback)
